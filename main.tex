@@ -1,0 +1,45 @@
+\documentclass{NSF}
+
+\graphicspath{{figures/}}
+
+\begin{document}
+\title{Project Update Report:Causal Collaborative Filtering\\Emma and Pan}
+
+\section{Introduction}
+Recommender systems play an important role in the process of information dissemination and in online commerce and media. These systems assist the user by filtering for the best content while simultaneously shaping their consumption behavior patterns. These popular collaborative filtering algorithms assume that users who share the same rating patterns on certain items, posts, or songs are more likely to have similar preferences for other items than a randomly chosen user. 
+
+While this strategy of representing the users preferences with their explicit ratings is dominant in online platforms, we want to explore another strategy: looking at the similarities between the “treatment effect” that these platforms recommender systems impose on different users. We hope to answer the question “what would the rating have been had we forced the user to buy the item or watch the movie?” And from this answer provide a recommendation for what to buy or watch next.
+
+\section{Related Work}
+The current work in causal recommendations focuses on the idea of using causal inference as a way to de-bias matrix factorization on existing logged data. For example, \cite{liang2016causal} jointly models both users exposure to an item, and their resulting click decision, resulting in a model which naturally down-weights the expected, but ultimately un-clicked items. \cite{liang2016modeling} proposes two exposure models, one of global popularity and one that personalizes the exposure for each user. As a result, the observational click data is weighted as though it came from an "experiment" where users are randomly shown items. Recent explorations towards casual recommendations also include \cite{bonner2018causal,wang2018deconfounded}.
+
+All these prior literature try to approximate an entirely-random recommendation environment for estimating the casual effect that recommender systems impose on the user. An alternative approach would be to use simulating methods to create ''counterfactual'' random recommendation simultaneously, and then estimate the heterogeneous treatment effect for each user. We will address the simulation setup in the following sections.
+
+\section{Simulation Experiment}
+In this section, we will introduce the basic setup for the simulation experiment as shown in Table \ref{setup}. Typically, we generate $m$ users and $n$ items with multivariate-distributed feature vectors.The utility of user $i$ to item $j$ is calculated as the euclidean distance between their feature vectors. We also introduce the exposure $M$ to represent the sparsity of the utility information: if $M_{ij}=1$, we assume that user $i$ has bought item $j$ before, otherwise user $i$ do not have any prior information about item $j$. The goal of the experiment is to compare similarity-based collaborative filtering method and casual effect-based collaborative filtering.
+
+For simulating the baseline similarity-based collaborative filtering model, we collect the user preference information directly from the exposed data and conduct cross-validation test to evaluate the recommendation performance.
+
+For simulating the casual effect-based collaborative filtering model, we will first estimate the treatment effect that similarity-based collaborative filtering impose on each user. Specifically, we calculate the difference of user purchase behavior between their reaction towards an entirely-random recommendation and the ''personalized'' collaborative filtering approach. For each iteration, we recommend 10 items for each user, and we assume that the user would purchase the item with the highest utility and update the recommender system accordingly. We repeat the recommendation procedure for a sufficient amount of time and compare the difference in distribution of purchased items in each case, which constitutes the treatment effect for that user. The difference is measured by the Mahalanobis Distance. After that, we conduct collaborative filtering based on the similarity of treatment effect.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{l l l}
+\hline
+Notation & Definition & Generation Method \\ \hline
+$m$ & Number of users & Hyperparameter \\
+$n$ & Number of items & Hyperparameter \\
+$X_{i}$ & Feature vector of user $i$ & MultiVariate(\textbf{O},\textbf{I})\\
+$Y_{j}$ & Feature vector of item $j$ & MultiVariate(\textbf{O},\textbf{I})\\
+$U_{ij}$ & Utility of user $i$ to item $j$ & Euclidean Distance between $X_{i}$ and $Y_{j}$\\
+$M$ & Exposure Matrix & Binary Sparse Matrix \\ \hline
+\end{tabular}
+\label{setup}
+\end{table}
+
+
+\renewcommand\refname{References Cited}
+\bibliography{references}
+\bibliographystyle{IEEEtran}
+
+\end{document}
